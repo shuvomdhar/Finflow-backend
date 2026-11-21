@@ -49,6 +49,11 @@ export function yearBounds(year: number): { start: string; end: string } {
   return { start: `${year}-01-01`, end: `${year + 1}-01-01` };
 }
 
-export function roundMoney(value: number): number {
-  return Math.round((value + Number.EPSILON) * 100) / 100;
+/**
+ * Money is stored in USD with eight decimal places, so preserve that precision
+ * when mapping database values and calculating totals.
+ */
+export function roundMoney(value: number, decimals = 8): number {
+  const factor = 10 ** decimals;
+  return Math.round((value + Number.EPSILON) * factor) / factor;
 }
