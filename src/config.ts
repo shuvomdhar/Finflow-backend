@@ -10,6 +10,17 @@ function required(name: string): string {
 
 const authBaseUrl = required('NEON_AUTH_BASE_URL');
 
+/**
+ * Deployment panels often store origins with quotes or a trailing slash, while
+ * browsers send a bare origin. Normalise both sides so CORS keeps matching.
+ */
+function normalizeOrigin(value: string): string {
+  return value
+    .trim()
+    .replace(/^["']|["']$/g, '')
+    .replace(/\/+$/, '');
+}
+
 export const config = {
   port: Number(process.env.PORT ?? 4000),
   databaseUrl: required('DATABASE_URL'),
@@ -22,6 +33,6 @@ export const config = {
   authAudience: process.env.NEON_AUTH_AUDIENCE ?? new URL(authBaseUrl).origin,
   corsOrigins: (process.env.CORS_ORIGIN ?? 'http://localhost:3000')
     .split(',')
-    .map((origin) => origin.trim())
+    .map(normalizeOrigin)
     .filter(Boolean),
 };

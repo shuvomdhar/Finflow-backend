@@ -16,13 +16,17 @@ import { markUserFailed } from './services/users.js';
 import { HttpError } from './utils.js';
 
 const app = express();
+const allowAnyOrigin = config.corsOrigins.includes('*');
 
 app.disable('x-powered-by');
 app.use(
   cors({
-    origin: config.corsOrigins,
+    // This API authenticates with explicit bearer tokens, never cookies, so a
+    // wildcard stays safe. Prefer listing the deployed web origins instead.
+    origin: allowAnyOrigin ? true : config.corsOrigins,
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    maxAge: 86400,
   }),
 );
 app.use(express.json({ limit: '1mb' }));
